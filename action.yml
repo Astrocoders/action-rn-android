@@ -37,7 +37,7 @@ runs:
       run: |
         # Force executable permission, otherwise people won't be able to install the apk via zap
         chmod a+x ${{ inputs.root }}/android/app/build/outputs/apk/production/release/app-production-release.apk
-        # Tar is needed to keep the file permissions as GitHub actions/upload loses them by default
+        # Tar is needed to keep the file permissions as GitHub actions/upload doesn't keep them by default
         cd ${{ inputs.root }}/android/app/build/outputs/apk/production/ && tar -pcvf release.tar release/
 
     - name: Upload Artifact
