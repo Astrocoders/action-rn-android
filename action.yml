@@ -1,0 +1,53 @@
+name: 'React Native Android Builder'
+description: 'Name says it all'
+inputs:
+  store-password:
+    description: 'Name says it all'
+    required: true
+  key-password:
+    description: 'Name says it all'
+    required: true
+  key-alias:
+    description: 'Name says it all'
+    required: true
+  keystore-file-base64: 
+    description: 'Name says it all'
+    required: true
+  root:
+    description: 'Name says it all'
+    required: true
+    default: '.'
+
+runs:
+  using: "composite"
+  steps:
+    - name: rehydrate keystore
+      run: echo ${{ inputs.keystore-file-base64 }} | base64 --decode > ${{ inputs.root }}/android/app/production.keystore
+
+    - name: build app
+      env: 
+        ANDROID_STORE_PASSWORD: ${{ inputs.store-password }}
+        ANDROID_KEY_PASSWORD: ${{ inputs.key-password }}
+        ANDROID_STORE_FILE: production.keystore
+        ANDROID_KEY_ALIAS: ${{ inputs.key-password }}
+        BUILD_NUMBER: ${{ inputs.build_number }}
+      run: cd ${{ inputs.root }}/android && ./gradlew assembleProductionRelease
+
+    - name: tar creation
+      run: |
+        # Force executable permission, otherwise people won't be able to install the apk via zap
+        chmod a+x ${{ inputs.root }}/android/app/build/outputs/apk/production/release/app-production-release.apk
+        # Tar is needed to keep the file permissions as GitHub actions/upload loses them by default
+        cd ${{ inputs.root }}/android/app/build/outputs/apk/production/ && tar -pcvf release.tar release/
+
+    - name: Upload Artifact
+      uses: actions/upload-artifact@v2
+      with:
+        name: release
+        path: ${{ inputs.root }}/android/app/build/outputs/apk/production/release.tar
+    - name: Upload APK
+      uses: actions/upload-artifact@v1
+      with:
+        name: app-production.apk
+        path: ${{ inputs.root }}/android/app/build/outputs/apk/production/release/app-production-release.apk
+
