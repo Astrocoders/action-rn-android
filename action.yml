@@ -31,6 +31,7 @@ runs:
         ANDROID_STORE_FILE: production.keystore
         ANDROID_KEY_ALIAS: ${{ inputs.key-password }}
         BUILD_NUMBER: ${{ inputs.build_number }}
+        VERSION_NAME: ${{ inputs.github_ref }}
       run: cd ${{ inputs.root }}/android && ./gradlew assembleProductionRelease
 
     - name: tar creation
