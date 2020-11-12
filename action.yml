@@ -17,6 +17,14 @@ inputs:
     description: 'Name says it all'
     required: true
     default: '.'
+  build_number:
+    description: 'Name says it all'
+    required: true
+    default: 0
+  version_name:
+    description: 'Name says it all'
+    required: true
+    default: '1.0.0'
 
 runs:
   using: "composite"
